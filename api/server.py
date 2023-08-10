@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import h5py
 from datetime import datetime
@@ -56,11 +56,11 @@ def execute_script():
                             'z_gyro': z_gyro,
                             'y_gyro': y_gyro
                         })
-
+                        csv_file_path = f'data_{dset}_new.csv'
+                        result = "CSV file(s) saved"
+                        return jsonify({"result": result, "csv_file_path": csv_file_path})
                         df.to_csv(f'data_{dset}_new.csv', index=False)  # name of the csv file data has to be saved in
                         print("File converted successfully")
-
-            result = "CSV file(s) saved"
         else:
             result = "Missing or invalid filename"
 
@@ -69,6 +69,15 @@ def execute_script():
         return jsonify({"error": str(e)})
     
             
+@app.route('/download-csv/<filename>', methods=['GET'])
+def download_csv(filename):
+    try:
+        # Construct the file path based on the filename
+        file_path = filename
+        # Serve the file using Flask's send_file function
+        return send_file(file_path, as_attachment=True)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 if __name__ == '__main__':
     app.run(debug=True)
