@@ -1,9 +1,12 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, make_response
 from flask_cors import CORS
 import h5py
 from datetime import datetime
 import pandas as pd
 import sys
+import os
+import io
+import zipfile
 
 
 app = Flask(__name__)
@@ -16,6 +19,7 @@ def execute_script():
         if fileName:
             f = h5py.File(fileName, 'r')  # name of the file from which data is being extracted
             # use these loops to get the key names
+            csv_links = []
             for group in f.keys():
                 if group == "Sensors":
                     for dset in f[group]:
@@ -56,28 +60,33 @@ def execute_script():
                             'z_gyro': z_gyro,
                             'y_gyro': y_gyro
                         })
-                        csv_file_path = f'data_{dset}_new.csv'
+                        csv_filename = f'data_{dset}_new.csv'
+                        csv_filepath = os.path.join('.', csv_filename)
                         result = "CSV file(s) saved"
-                        return jsonify({"result": result, "csv_file_path": csv_file_path})
-                        df.to_csv(f'data_{dset}_new.csv', index=False)  # name of the csv file data has to be saved in
+                        df.to_csv(csv_filepath, index=False)
                         print("File converted successfully")
+                        csv_links.append(csv_filename)
+                        
+            return jsonify({"result": "CSV file(s) processed", "csv_data": csv_links})
         else:
-            result = "Missing or invalid filename"
+            return jsonify({"error": "Missing or invalid filename"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
-        return jsonify({"result": result})
-    except Exception as e:
-        return jsonify({"error": str(e)})
-    
-            
-@app.route('/download-csv/<filename>', methods=['GET'])
-def download_csv(filename):
+
+@app.route('/get-csv/<filename>', methods=['GET'])
+def get_csv(filename):
     try:
-        # Construct the file path based on the filename
-        file_path = filename
-        # Serve the file using Flask's send_file function
-        return send_file(file_path, as_attachment=True)
+        csv_filepath = os.path.join(request.args.get('download_path', ''), filename)
+
+        if os.path.exists(csv_filepath):
+            with open(csv_filepath, 'r') as csv_file:
+                csv_content = csv_file.read()
+                return jsonify({"content": csv_content})
+        else:
+            return jsonify({"error": "File not found"})
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)})       
 
 if __name__ == '__main__':
     app.run(debug=True)
