@@ -12,7 +12,7 @@ import zipfile
 app = Flask(__name__)
 CORS(app, origins=['https://main--superb-shortbread-f55b0a.netlify.app'])
 
-@app.route('/execute-script', methods=['POST'])
+@app.route('/execute-script', methods=['POST', 'OPTIONS'])
 def execute_script():
     try:
         fileName = request.files.get('file')
