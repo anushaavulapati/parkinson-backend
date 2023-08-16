@@ -10,7 +10,7 @@ import zipfile
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=['https://main--superb-shortbread-f55b0a.netlify.app'])
 
 @app.route('/execute-script', methods=['POST'])
 def execute_script():
