@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_file, make_response
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import h5py
 from datetime import datetime
 import pandas as pd
@@ -8,16 +8,12 @@ import os
 import io
 import zipfile
 
-cors_config ={
-    "origins": ["https://main--superb-shortbread-f55b0a.netlify.app"]
-}
-
 app = Flask(__name__)
-CORS(app, resources={
-    r"/*": cors_config
-})
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/execute-script', methods=['POST', 'OPTIONS'])
+@cross_origin()
 def execute_script():
     try:
         fileName = request.files.get('file')
