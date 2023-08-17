@@ -8,9 +8,14 @@ import os
 import io
 import zipfile
 
+cors_config ={
+    "origins": ["https://main--superb-shortbread-f55b0a.netlify.app"]
+}
 
 app = Flask(__name__)
-CORS(app, origins=['https://main--superb-shortbread-f55b0a.netlify.app'])
+CORS(app, resources={
+    r"/*": cors_config
+})
 
 @app.route('/execute-script', methods=['POST', 'OPTIONS'])
 def execute_script():
