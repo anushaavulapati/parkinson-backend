@@ -76,6 +76,7 @@ def execute_script():
 
 
 @app.route('/get-csv/<filename>', methods=['GET'])
+@cross_origin()
 def get_csv(filename):
     try:
         csv_filepath = os.path.join(request.args.get('download_path', ''), filename)
