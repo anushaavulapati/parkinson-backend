@@ -13,7 +13,7 @@ cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/execute-script', methods=['POST', 'OPTIONS'])
-@cross_origin()
+@cross_origin(origins=["https://main--superb-shortbread-f55b0a.netlify.app/"])
 def execute_script():
     try:
         fileName = request.files.get('file')
@@ -76,7 +76,7 @@ def execute_script():
 
 
 @app.route('/get-csv/<filename>', methods=['GET'])
-@cross_origin()
+@cross_origin(origins=["https://main--superb-shortbread-f55b0a.netlify.app/"])
 def get_csv(filename):
     try:
         csv_filepath = os.path.join(request.args.get('download_path', ''), filename)
