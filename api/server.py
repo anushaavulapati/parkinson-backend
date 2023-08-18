@@ -9,11 +9,11 @@ import io
 import zipfile
 
 app = Flask(__name__)
-cors = CORS(app)
+cors = CORS(app, resources={r'*':{'origins': '*'}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route('/execute-script', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["https://main--superb-shortbread-f55b0a.netlify.app/"])
+@cross_origin()
 def execute_script():
     try:
         fileName = request.files.get('file')
@@ -76,7 +76,6 @@ def execute_script():
 
 
 @app.route('/get-csv/<filename>', methods=['GET'])
-@cross_origin(origins=["https://main--superb-shortbread-f55b0a.netlify.app/"])
 def get_csv(filename):
     try:
         csv_filepath = os.path.join(request.args.get('download_path', ''), filename)
